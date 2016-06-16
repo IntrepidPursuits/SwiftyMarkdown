@@ -309,9 +309,6 @@ public class SwiftyMarkdown {
 	func attributedStringFromString(string : String, withStyle style : LineStyle, attributes : [String : AnyObject] = [:] ) -> NSAttributedString {
         var attributes = attributes
 
-		// Default to body font
-		attributes[NSFontAttributeName] = body.font
-		
 		switch currentType {
 		case .H1:
 			attributes[NSFontAttributeName] = h1.font
@@ -337,8 +334,6 @@ public class SwiftyMarkdown {
 			break
 		}
 		
-		// Check for code
-		
 		if style == .Code {
 			attributes[NSFontAttributeName] = code.font
 			attributes[NSForegroundColorAttributeName] = code.color
@@ -348,6 +343,16 @@ public class SwiftyMarkdown {
 			attributes[NSFontAttributeName] = link.font
 			attributes[NSForegroundColorAttributeName] = link.color
 		}
+        
+        if style == .Italic {
+            attributes[NSFontAttributeName] = italic.font
+            attributes[NSForegroundColorAttributeName] = italic.color
+        }
+        
+        if style == .Bold {
+            attributes[NSFontAttributeName] = bold.font
+            attributes[NSForegroundColorAttributeName] = bold.color
+        }
 		
 		return NSAttributedString(string: string, attributes: attributes)
 	}
