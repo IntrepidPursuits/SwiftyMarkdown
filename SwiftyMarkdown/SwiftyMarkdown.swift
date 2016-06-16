@@ -10,7 +10,7 @@ import UIKit
 
 
 public protocol FontProperties {
-	var fontName : String? { get set }
+	var font : UIFont { get set }
 	var color : UIColor { get set }
 }
 
@@ -21,7 +21,7 @@ A struct defining the styles that can be applied to the parsed Markdown. The `fo
 If that is not set, then the system default will be used.
 */
 public struct BasicStyles : FontProperties {
-	public var fontName : String? = UIFont.preferredFontForTextStyle(UIFontTextStyleBody).fontName
+	public var font : UIFont = UIFont.preferredFontForTextStyle(UIFontTextStyleBody)
 	public var color = UIColor.blackColor()
 }
 
@@ -307,53 +307,32 @@ public class SwiftyMarkdown {
 	// Make H1
 	
 	func attributedStringFromString(string : String, withStyle style : LineStyle, attributes : [String : AnyObject] = [:] ) -> NSAttributedString {
-		let textStyle : String
-		var fontName : String?
         var attributes = attributes
 
-		// What type are we and is there a font name set?
-		
+		// Default to body font
+		attributes[NSFontAttributeName] = body.font
 		
 		switch currentType {
 		case .H1:
-			fontName = h1.fontName
-			if #available(iOS 9, *) {
-				textStyle = UIFontTextStyleTitle1
-			} else {
-				textStyle = UIFontTextStyleHeadline
-			}
+			attributes[NSFontAttributeName] = h1.font
 			attributes[NSForegroundColorAttributeName] = h1.color
 		case .H2:
-			fontName = h2.fontName
-			if #available(iOS 9, *) {
-				textStyle = UIFontTextStyleTitle2
-			} else {
-				textStyle = UIFontTextStyleHeadline
-			}
+			attributes[NSFontAttributeName] = h2.font
 			attributes[NSForegroundColorAttributeName] = h2.color
 		case .H3:
-			fontName = h3.fontName
-			if #available(iOS 9, *) {
-				textStyle = UIFontTextStyleTitle2
-			} else {
-				textStyle = UIFontTextStyleSubheadline
-			}
+			attributes[NSFontAttributeName] = h3.font
 			attributes[NSForegroundColorAttributeName] = h3.color
 		case .H4:
-			fontName = h4.fontName
-			textStyle = UIFontTextStyleHeadline
+			attributes[NSFontAttributeName] = h4.font
 			attributes[NSForegroundColorAttributeName] = h4.color
 		case .H5:
-			fontName = h5.fontName
-			textStyle = UIFontTextStyleSubheadline
+			attributes[NSFontAttributeName] = h5.font
 			attributes[NSForegroundColorAttributeName] = h5.color
 		case .H6:
-			fontName = h6.fontName
-			textStyle = UIFontTextStyleFootnote
+			attributes[NSFontAttributeName] = h6.font
 			attributes[NSForegroundColorAttributeName] = h6.color
 		default:
-			fontName = body.fontName
-			textStyle = UIFontTextStyleBody
+			attributes[NSFontAttributeName] = body.font
 			attributes[NSForegroundColorAttributeName] = body.color
 			break
 		}
@@ -361,45 +340,14 @@ public class SwiftyMarkdown {
 		// Check for code
 		
 		if style == .Code {
-			fontName = code.fontName
+			attributes[NSFontAttributeName] = code.font
 			attributes[NSForegroundColorAttributeName] = code.color
 		}
 		
 		if style == .Link {
-			fontName = link.fontName
+			attributes[NSFontAttributeName] = link.font
 			attributes[NSForegroundColorAttributeName] = link.color
 		}
-		
-		// Fallback to body
-		if let _ = fontName {
-			
-		} else {
-			fontName = body.fontName
-		}
-		
-		let font = UIFont.preferredFontForTextStyle(textStyle)
-		let styleDescriptor = font.fontDescriptor()
-		let styleSize = styleDescriptor.fontAttributes()[UIFontDescriptorSizeAttribute] as? CGFloat ?? CGFloat(14)
-		
-		var finalFont : UIFont
-		if let finalFontName = fontName, font = UIFont(name: finalFontName, size: styleSize) {
-			finalFont = font
-		} else {
-			finalFont = UIFont.preferredFontForTextStyle(textStyle)
-		}
-		
-		let finalFontDescriptor = finalFont.fontDescriptor()
-		if style == .Italic {
-			let italicDescriptor = finalFontDescriptor.fontDescriptorWithSymbolicTraits(.TraitItalic)
-			finalFont = UIFont(descriptor: italicDescriptor, size: styleSize)
-		}
-		if style == .Bold {
-			let boldDescriptor = finalFontDescriptor.fontDescriptorWithSymbolicTraits(.TraitBold)
-			finalFont = UIFont(descriptor: boldDescriptor, size: styleSize)
-		}
-		
-		
-		attributes[NSFontAttributeName] = finalFont
 		
 		return NSAttributedString(string: string, attributes: attributes)
 	}
