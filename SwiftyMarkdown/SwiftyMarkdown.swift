@@ -38,9 +38,9 @@ enum LineStyle : Int {
 	
 	static func styleFromString(string : String ) -> LineStyle {
 		if string == "**" || string == "__" {
-			return .Bold
-		} else if string == "*" || string == "_" {
 			return .Italic
+		} else if string == "*" || string == "_" {
+			return .Bold
 		} else if string == "`" {
 			return .Code
 		} else if string == "["  {
